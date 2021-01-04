@@ -40,8 +40,22 @@ function bin2dec(bin) { // 2진수 배열을 10진수로 변환하는 함수
 function dec2bin2dec(decimal) { //10진수를 2진수배열로 변경 후 2진수끼리 덧셈한 결과를 10진수로 출력하기
   return bin2dec(dec2bin(decimal));
 }
+
+//2진수배열을 16진수로 변환하기
+function BinaryNumToHex(binaryArray) {
+  const HexNum = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'];
+  const digit = 4 - (binaryArray.length % 4 || 4);
+  const binArr = binaryArray.concat(new Array(digit).fill(0));
+  const HexArr = [];
+  for (let i = 0; i < binArr.length; i += 4) {
+   const decimal = bin2dec([binArr[i], binArr[i+1], binArr[i+2], binArr[i+3]]);
+   HexArr.push(HexNum[decimal]);
+  }
+  return HexArr;
+}
 console.log(dec2bin(173));
 console.log(getSquaredCount(16));
 console.log(bin2dec([1, 1, 1, 1, 0, 1, 0, 1]))
 console.log(byteAdder([1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 0, 1, 1, 0, 0, 1]))
-console.log(dec2bin2dec(18))
+console.log(dec2bin2dec(17))
+console.log(BinaryNumToHex([1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]))
