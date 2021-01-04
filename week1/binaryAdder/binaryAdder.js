@@ -5,7 +5,15 @@ function halfAdder(bitA, bitB) {
   answer[1] = !isBothTrue(bitA,bitB) && (bitA || bitB);
   return answer;
 }
-
+//전체 덧셈
+function fullAdder(bitA, bitB, carry) {
+  const answer = [];
+  const halfResult = halfAdder(bitA, bitB);
+  const bothTrueCheck = isBothTrue(halfResult[1], carry);
+  answer[0] = bothTrueCheck || halfResult[0];
+  answer[1] = !bothTrueCheck && (halfResult[1] || carry); 
+  return answer;
+}
 //둘다 참일때
 function isBothTrue(A, B){
   return A && B;
