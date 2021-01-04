@@ -26,8 +26,11 @@ function getXor(A, B) {
 
 function byteAdder(byteA, byteB) { //8비트 덧셈기
   const answer = [];
+  const maxLength = Math.max(byteA.length, byteB.length);
+  byteA = byteA.concat(new Array(maxLength - byteA.length).fill(0));
+  byteB = byteB.concat(new Array(maxLength - byteB.length).fill(0));
   let carry = 0;
-  for (let i = 0; i < byteA.length; i++) {
+  for (let i = 0; i < maxLength; i++) {
     const [next, current] = fullAdder(byteA[i], byteB[i], carry);
     answer[i] = current;
     carry = next;
@@ -37,5 +40,5 @@ function byteAdder(byteA, byteB) { //8비트 덧셈기
 }
 // console.log(halfadder(0, 0));
 // console.log(fullAdder(0, 1, 0));
-console.log(byteAdder([1, 1, 0, 1, 1, 0, 1, 0], [1, 0, 1, 1, 0, 0, 1, 1]));
+console.log(byteAdder([0, 1, 0, 1, 1, 0, 0, 0], [1, 0, 1, 1, 0, 0, 1, 1]));
 console.log(byteAdder([1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 0, 1, 1, 0, 0, 1]));
