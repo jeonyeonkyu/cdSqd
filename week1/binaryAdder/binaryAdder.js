@@ -20,7 +20,8 @@ function isBothTrue(A, B) { //둘다 참일때
 }
 
 function getXor(A, B) {
-  return !(A && B) && (A || B);
+  const result = !(A && B) && (A || B);
+  return result ? 1 : 0;
 }
 
 function byteAdder(byteA, byteB) { //8비트 덧셈기
@@ -36,5 +37,5 @@ function byteAdder(byteA, byteB) { //8비트 덧셈기
 }
 // console.log(halfadder(0, 0));
 // console.log(fullAdder(0, 1, 0));
-console.log(byteAdder([ 1, 1, 0, 1, 1, 0, 1, 0 ], [ 1, 0, 1, 1, 0, 0, 1, 1 ]));
-console.log(byteAdder([ 1, 1, 0, 0, 1, 0, 1, 0 ], [ 1, 1, 0, 1, 1, 0, 0, 1 ]));
+console.log(byteAdder([1, 1, 0, 1, 1, 0, 1, 0], [1, 0, 1, 1, 0, 0, 1, 1]));
+console.log(byteAdder([1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 0, 1, 1, 0, 0, 1]));
