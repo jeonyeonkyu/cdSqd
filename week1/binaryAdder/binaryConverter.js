@@ -44,23 +44,23 @@ function dec2bin2dec(decimalA = 0, decimalB = 0) { //10진수를 2진수배열�
 
 
 function binaryNumToHex(binaryArray) { //2진수배열을 16진수로 변환하기
-  const HexNum = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'];
+  const hexRuleArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'];
   const digit = 4 - (binaryArray.length % 4 || 4);
   const binArr = binaryArray.concat(new Array(digit).fill(0));
-  const HexArr = [];
+  const hexArr = [];
   for (let i = 0; i < binArr.length; i += 4) {
     const decimal = bin2dec([binArr[i], binArr[i + 1], binArr[i + 2], binArr[i + 3]]);
-    HexArr.push(HexNum[decimal]);
+    hexArr.push(hexRuleArray[decimal]);
   }
-  return HexArr;
+  return hexArr;
 }
 
-function hexNumToDecimal(HexArray) { //16진수 배열을 10진수로 변환하기
-  const HexNum = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'];
+function hexNumToDecimal(hexArray) { //16진수 배열을 10진수로 변환하기
+  const hexRuleArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'];
   const decimalArray = [];
   let decimalNumber = 0;
-  HexArray.forEach(element => {
-    decimalArray.push(HexNum.indexOf(element));
+  hexArray.forEach(element => {
+    decimalArray.push(hexRuleArray.indexOf(element));
   })
   console.log(decimalArray)
   decimalArray.forEach((element, index) => {
