@@ -37,25 +37,42 @@ function bin2dec(bin) { // 2진수 배열을 10진수로 변환하는 함수
   return answer;
 }
 
-function dec2bin2dec(decimal) { //10진수를 2진수배열로 변경 후 2진수끼리 덧셈한 결과를 10진수로 출력하기
-  return bin2dec(dec2bin(decimal));
+function dec2bin2dec(decimalA = 0, decimalB = 0) { //10진수를 2진수배열로 변경 후 2진수끼리 덧셈한 결과를 10진수로 출력하기
+  const binarySumArray = byteAdder(dec2bin(decimalA), dec2bin(decimalB));
+  return bin2dec(binarySumArray);
 }
 
-//2진수배열을 16진수로 변환하기
-function BinaryNumToHex(binaryArray) {
+
+function binaryNumToHex(binaryArray) { //2진수배열을 16진수로 변환하기
   const HexNum = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'];
   const digit = 4 - (binaryArray.length % 4 || 4);
   const binArr = binaryArray.concat(new Array(digit).fill(0));
   const HexArr = [];
   for (let i = 0; i < binArr.length; i += 4) {
-   const decimal = bin2dec([binArr[i], binArr[i+1], binArr[i+2], binArr[i+3]]);
-   HexArr.push(HexNum[decimal]);
+    const decimal = bin2dec([binArr[i], binArr[i + 1], binArr[i + 2], binArr[i + 3]]);
+    HexArr.push(HexNum[decimal]);
   }
   return HexArr;
 }
+
+function hexNumToDecimal(HexArray) { //16진수 배열을 10진수로 변환하기
+  const HexNum = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'];
+  const decimalArray = [];
+  let decimalNumber = 0;
+  HexArray.forEach(element => {
+    decimalArray.push(HexNum.indexOf(element));
+  })
+  console.log(decimalArray)
+  decimalArray.forEach((element, index) => {
+    decimalNumber += element * (16 ** index);
+  })
+  return decimalNumber;
+}
+
 console.log(dec2bin(173));
 console.log(getSquaredCount(16));
-console.log(bin2dec([1, 1, 1, 1, 0, 1, 0, 1]))
-console.log(byteAdder([1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 0, 1, 1, 0, 0, 1]))
-console.log(dec2bin2dec(17))
-console.log(BinaryNumToHex([1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]))
+console.log(bin2dec([1, 1, 1, 1, 0, 1, 0, 1]));
+console.log(byteAdder([1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 0, 1, 1, 0, 0, 1]));
+console.log(dec2bin2dec(124, 123));
+console.log(binaryNumToHex([1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1]));
+console.log(hexNumToDecimal(['e', 1]));
