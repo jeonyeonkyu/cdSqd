@@ -3,7 +3,7 @@ class UniqueIdGenerator {  // 유니크한 아이디 만들기 a~f까지 ex) eaf
     this.idList = [];
   }
 
-  getRandomId = () => {
+  getRandomId() {
     const id = String.fromCharCode(Math.floor(Math.random() * 6 + 97),
       Math.floor(Math.random() * 6 + 97),
       Math.floor(Math.random() * 6 + 97),
@@ -11,7 +11,7 @@ class UniqueIdGenerator {  // 유니크한 아이디 만들기 a~f까지 ex) eaf
     return id;
   }
 
-  makeId = () => {
+  makeId() {
     let id = this.getRandomId();
     for (let i = 0; i < this.idList.length; i++) {
       if (this.idList[i] === id) {
@@ -22,12 +22,12 @@ class UniqueIdGenerator {  // 유니크한 아이디 만들기 a~f까지 ex) eaf
     this.idList.push(id);
   }
 
-  getUniqueId = () => {
+  getUniqueId() {
     this.makeId();
     return this.idList[this.idList.length - 1];
   }
 }
 
-const uniqueId = new UniqueIdGenerator();
-Object.freeze(uniqueId);
-module.exports = uniqueId;
+const uniqueIdGenerator = new UniqueIdGenerator();
+Object.freeze(uniqueIdGenerator);
+module.exports = uniqueIdGenerator;
