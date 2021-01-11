@@ -69,6 +69,22 @@ class VideoListGenerator {
     }
     currentNode.next = nextNode.next;
     nextNode = null;
+    this.size--;
+  }
+
+  getPlayTime() {
+    let playTime = 0;
+    let currentNode = this.head;
+    while (currentNode !== null) {
+      playTime += currentNode.data.playTime;
+      currentNode = currentNode.next;
+    }
+    return playTime;
+  }
+
+  render() {
+    console.log(`영상클립: ${this.size}개`);
+    console.log(`전체길이: ${this.getPlayTime()}sec`);
   }
 }
 const videoListGenerator = new VideoListGenerator();
