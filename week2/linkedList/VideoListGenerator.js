@@ -24,7 +24,7 @@ class VideoListGenerator {
   addLast(node) {
     const nodeData = new NodeData(node);
     if (this.head === null) {
-      this.addFirst(node);
+      return this.addFirst(node);
     } else {
       this.tail.next = nodeData;
       this.tail = nodeData;
@@ -34,9 +34,9 @@ class VideoListGenerator {
 
   insert(node, order = 0) {
     if (order === 0) {
-      this.addFirst(node);
+      return this.addFirst(node);
     } else if (order >= this.size) {
-      this.addLast(node);
+      return this.addLast(node);
     } else {
       const nodeData = new NodeData(node);
       let nextNode = this.head.next;
@@ -51,6 +51,25 @@ class VideoListGenerator {
     }
   }
 
+  deleteFromId(id) {
+    if (this.size === 0) return;
+    if (this.head.data.id === id) {
+      this.head = this.head.next;
+      this.size--;
+      return;
+    }
+    let nextNode = this.head.next;
+    let currentNode = this.head;
+    while (nextNode.data.id !== id) {
+      nextNode = nextNode.next;
+      currentNode = currentNode.next;
+      if (nextNode === null) {
+        return;
+      }
+    }
+    currentNode.next = nextNode.next;
+    nextNode = null;
+  }
 }
 const videoListGenerator = new VideoListGenerator();
 videoListGenerator.addLast('aa');
@@ -58,8 +77,8 @@ videoListGenerator.addLast('aa');
 videoListGenerator.addFirst('gg');
 videoListGenerator.addLast('cc');
 videoListGenerator.addLast('dd');
-videoListGenerator.insert('qq', 5)
+videoListGenerator.insert('qq', 0)
 
-
-
+// console.dir(videoListGenerator.head, { depth: null });
+videoListGenerator.deleteFromId('qq')
 console.dir(videoListGenerator.head, { depth: null });
