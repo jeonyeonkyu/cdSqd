@@ -5,10 +5,8 @@ const getPlayTime = () => {
   return Math.ceil(Math.random() * 10) + Math.round(Math.random() * 5);
 }
 
-function MyVideoList({ uniqueIdGenerator, titleGenerator }) {
+function MyVideo({ uniqueIdGenerator, titleGenerator }) {
   this.id = uniqueIdGenerator.getUniqueId();
-  this.head = null;
-  this.next = null;
   this.title = titleGenerator.getTitle();
   this.playTime = getPlayTime();
 
@@ -17,30 +15,30 @@ function MyVideoList({ uniqueIdGenerator, titleGenerator }) {
   }
 }
 
-const myVideoList1 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList2 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList3 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList4 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList5 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList6 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList7 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList8 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList9 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList10 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList11 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList12 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
-const myVideoList13 = new MyVideoList({ uniqueIdGenerator, titleGenerator });
+const myVideo1 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo2 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo3 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo4 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo5 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo6 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo7 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo8 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo9 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo10 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo11 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo12 = new MyVideo({ uniqueIdGenerator, titleGenerator });
+const myVideo13 = new MyVideo({ uniqueIdGenerator, titleGenerator });
 
-myVideoList1.printInformation();
-myVideoList2.printInformation();
-myVideoList3.printInformation();
-myVideoList4.printInformation();
-myVideoList5.printInformation();
-myVideoList6.printInformation();
-myVideoList7.printInformation();
-myVideoList8.printInformation();
-myVideoList9.printInformation();
-myVideoList10.printInformation();
-myVideoList11.printInformation();
-myVideoList12.printInformation();
-myVideoList13.printInformation();
+myVideo1.printInformation();
+myVideo2.printInformation();
+myVideo3.printInformation();
+myVideo4.printInformation();
+myVideo5.printInformation();
+myVideo6.printInformation();
+myVideo7.printInformation();
+myVideo8.printInformation();
+myVideo9.printInformation();
+myVideo10.printInformation();
+myVideo11.printInformation();
+myVideo12.printInformation();
+myVideo13.printInformation();
