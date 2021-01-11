@@ -86,15 +86,19 @@ class VideoListGenerator {
     console.log(`영상클립: ${this.size}개`);
     console.log(`전체길이: ${this.getPlayTime()}sec`);
   }
+
+  print() {
+    let printText = '|';
+    let currentNode = this.head;
+    for (let i = 0; i < this.size; i++) {
+      printText += `---[${currentNode.data.id}, ${currentNode.data.playTime}sec]`;
+      currentNode = currentNode.next;
+    }
+    printText += '---[end]---|';
+    console.log(printText);
+  }
 }
+
+
 const videoListGenerator = new VideoListGenerator();
-videoListGenerator.addLast('aa');
-
-videoListGenerator.addFirst('gg');
-videoListGenerator.addLast('cc');
-videoListGenerator.addLast('dd');
-videoListGenerator.insert('qq', 0)
-
-// console.dir(videoListGenerator.head, { depth: null });
-videoListGenerator.deleteFromId('qq')
-console.dir(videoListGenerator.head, { depth: null });
+module.exports = videoListGenerator;
