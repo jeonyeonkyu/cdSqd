@@ -6,7 +6,6 @@ function NodeData(node) {
 class VideoListGenerator {
   constructor() {
     this.head = null;
-    this.next = null;
     this.tail = null;
     this.size = 0;
   }
