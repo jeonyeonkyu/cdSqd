@@ -6,7 +6,7 @@ class MyVideoData {
   }
 
   getPlayTime() {
-    return Math.ceil(Math.random() * 10) + Math.round(Math.random() * 5);
+    return Math.ceil(Math.random() * 15);
   }
 
   printInformation = function () {
