@@ -4,10 +4,11 @@ class UniqueIdGenerator {  // 유니크한 아이디 만들기 a~f까지 ex) eaf
   }
 
   getRandomId() {
-    const id = String.fromCharCode(Math.floor(Math.random() * 6 + 97),
-      Math.floor(Math.random() * 6 + 97),
-      Math.floor(Math.random() * 6 + 97),
-      Math.floor(Math.random() * 6 + 97));
+    const alphabetStartNum = 97;
+    const id = String.fromCharCode(Math.floor(Math.random() * 6 + alphabetStartNum),
+      Math.floor(Math.random() * 6 + alphabetStartNum),
+      Math.floor(Math.random() * 6 + alphabetStartNum),
+      Math.floor(Math.random() * 6 + alphabetStartNum));
     return id;
   }
 
