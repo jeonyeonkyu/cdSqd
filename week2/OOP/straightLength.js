@@ -25,9 +25,13 @@ const inputDivision = (word) => {
   const wordArray = word.split('-');
   const aWord = wordArray[0].slice(1, wordArray[0].length - 1);
   const bWord = wordArray[1].slice(1, wordArray[1].length - 1);
-  const A = aWord.split(',');
-  const B = bWord.split(',');
+  const A = aWord.split(',').map(Number);
+  const B = bWord.split(',').map(Number);
   return [...A, ...B];
+}
+
+const checkNegative = (...rest) => {
+  return rest.some(element => element < 0);
 }
 
 const useReadLine = (A, B) => {
