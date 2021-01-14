@@ -9,12 +9,10 @@ class Location {
     return this.yPosition;
   }
   set x(value) {
-    if (this.checkSize(value)) return -1;
-    this.xPosition = value;
+    this.xPosition = this.checkSize(value) ? value : -1;
   }
   set y(value) {
-    if (this.checkSize(value)) return -1;
-    this.yPosition = value;
+    this.yPosition = this.checkSize(value) ? value : -1;
   }
   checkSize(value) {
     return value <= this.limitSize ? true : false;
@@ -49,19 +47,16 @@ const useReadLine = (A, B) => {
     [A.x, A.y, B.x, B.y] = inputDivision(line);
     if (!checkNegative(A.x, A.y, B.x, B.y)) {
       const straightLength = getDistanceBetweenTwoPoints(A.x, A.y, B.x, B.y);
-      console.log(straightLength);
+      console.log(`'''두 점사이의 거리는 ${straightLength}'''`);
       rl.close();
     } else {
-      rl.setPrompt('> 잘못 입력하셨습니다. 다시 입력해주세요.');
-      rl.prompt();
-      console.log();
+      console.log('> 잘못 입력하셨습니다. 다시 입력해주세요.');
     }
   })
   rl.on("close", () => {
     process.exit();
   })
 }
-
 
 const A = new Location();
 const B = new Location();
