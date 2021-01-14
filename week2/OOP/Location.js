@@ -1,6 +1,6 @@
 class Location {
   constructor(xPos, yPos) {
-    this.limitSize = 24;
+    this.MAX_POSITION = 24;
     this.x = xPos;
     this.y = yPos;
   }
@@ -17,12 +17,13 @@ class Location {
     this.yPosition = this.checkSize(value) ? value : -1;
   }
   checkSize(value) {
-    return value <= this.limitSize ? true : false;
+    return value <= this.MAX_POSITION ? true : false;
   }
 }
+module.exports = Location;
 
 const checkNegative = (...rest) => {
-  return rest.some(element => element.x < 0 && element.y < 0);
+  return rest.some(({ x, y }) => x < 0 && y < 0);
 }
 
 const inputDivision = (word) => {
@@ -35,38 +36,37 @@ const inputDivision = (word) => {
   return divisionArray;
 }
 
-const getDistanceBetweenTwoPoints = (...location) => {
-  return Math.sqrt((location[0].x - location[1].x) ** 2 + (location[0].y - location[1].y) ** 2);
+const getDistanceBetweenTwoPoints = ([first, second]) => {
+  return Math.sqrt((first.x - second.x) ** 2 + (first.y - second.y) ** 2);
 }
 
-const getTriangleArea = (...location) => {
-  const side1 = getDistanceBetweenTwoPoints(location[0], location[1]);
-  const side2 = getDistanceBetweenTwoPoints(location[0], location[2]);
-  const side3 = getDistanceBetweenTwoPoints(location[1], location[2]);
+const getTriangleArea = ([first, second, third]) => {
+  const side1 = getDistanceBetweenTwoPoints([first, second]);
+  const side2 = getDistanceBetweenTwoPoints([first, third]);
+  const side3 = getDistanceBetweenTwoPoints([second, third]);
   const half = (side1 + side2 + side3) / 2;
   return Math.sqrt(half * (half - side1) * (half - side2) * (half - side3));
 }
 
+const getPointSavedSet = (location) => {
+  return location.reduce(({ xSet, ySet }, { x, y }) => {
+    xSet.add(x);
+    ySet.add(y);
+    return { xSet, ySet };
+  }, { xSet: new Set(), ySet: new Set() })
+}
+
 const checkSquare = (location) => {
-  const xSet = new Set();
-  const ySet = new Set();
-  location.forEach(element => {
-    xSet.add(element.x);
-    ySet.add(element.y);
-  })
-  return xSet.size === 2 && ySet.size === 2 ? true : false;
+  return Object.entries(getPointSavedSet(location))
+    .filter(([_, value]) => value.size === 2)
+    .length === 2;
 }
 
 const getSquareArea = (location) => {
-  const xSet = new Set();
-  const ySet = new Set();
-  location.forEach(element => {
-    xSet.add(element.x);
-    ySet.add(element.y);
-  })
-  const xArray = [...xSet];
-  const yArray = [...ySet];
-  return Math.abs((xArray[0] - xArray[1]) * (yArray[0] - yArray[1]));
+  const { xSet, ySet } = getPointSavedSet(location);
+  const [x1, x2] = [...xSet];
+  const [y1, y2] = [...ySet];
+  return Math.abs((x1 - x2) * (y1 - y2));
 }
 
 
@@ -83,30 +83,33 @@ const useReadLine = (Location) => {
   console.log('ex) 사각형 넓이 구하기 (10,10)-(22,10)-(22,18)-(10,18)');
   console.log('"Q" 입력시 종료');
   rl.on("line", (line) => {
-    if (line.toUpperCase() === 'Q') rl.close();
+    if (line.toUpperCase() === 'Q') {
+      rl.close();
+    }
     const location = inputDivision(line)
       .map(element => element = new Location(element[0], element[1]));
+
     if (!checkNegative(...location)) {
       switch (location.length) {
         case 2:
-          const straightLength = getDistanceBetweenTwoPoints(...location);
+          const straightLength = getDistanceBetweenTwoPoints(location);
           console.log(`'''두 점사이의 거리는 ${straightLength}'''`);
           break;
         case 3:
-          const triangleArea = getTriangleArea(...location);
+          const triangleArea = getTriangleArea(location);
           console.log(`'''삼각형 넓이는 ${triangleArea}'''`);
           break;
         case 4:
           if (checkSquare(location)) {
             const squareArea = getSquareArea(location);
             console.log(`'''사각형 넓이는 ${squareArea}'''`);
-          } else { 
-            console.log('> 잘못 입력하셨습니다. 다시 입력해주세요.');
+          } else {
+            console.log('> 직사각형이 아닙니다. 다시 입력해주세요.');
           }
           break;
       }
     } else {
-      console.log('> 잘못 입력하셨습니다. 다시 입력해주세요.');
+      console.log('> 숫자는 0 <= x <= 24 만 가능합니다. 다시 입력해주세요.');
     }
   })
   rl.on("close", () => {
