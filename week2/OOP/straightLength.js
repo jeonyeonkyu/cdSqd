@@ -1,6 +1,8 @@
 class Location {
-  constructor() {
+  constructor(xPos, yPos) {
     this.limitSize = 24;
+    this.x = xPos;
+    this.y = yPos;
   }
   get x() {
     return this.xPosition;
@@ -21,11 +23,12 @@ class Location {
 
 const inputDivision = (word) => {
   const wordArray = word.split('-');
-  const aWord = wordArray[0].slice(1, wordArray[0].length - 1);
-  const bWord = wordArray[1].slice(1, wordArray[1].length - 1);
-  const A = aWord.split(',').map(Number);
-  const B = bWord.split(',').map(Number);
-  return [...A, ...B];
+  const divisionArray = wordArray.map(element => {
+    return element.slice(1, element.length - 1)
+      .split(',')
+      .map(Number);
+  })
+  return divisionArray;
 }
 
 const checkNegative = (...rest) => {
@@ -60,4 +63,6 @@ const useReadLine = (A, B) => {
 
 const A = new Location();
 const B = new Location();
-useReadLine(A, B);
+// useReadLine(A, B);
+
+console.log(inputDivision('(10,20)-(20,30)-(20,10)'))
