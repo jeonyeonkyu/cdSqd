@@ -9,11 +9,11 @@ class Location {
     return this.yPosition;
   }
   set x(value) {
-    if (checkSize(value)) return -1;
+    if (this.checkSize(value)) return -1;
     this.xPosition = value;
   }
   set y(value) {
-    if (checkSize(value)) return -1;
+    if (this.checkSize(value)) return -1;
     this.yPosition = value;
   }
   checkSize(value) {
@@ -34,23 +34,28 @@ const checkNegative = (...rest) => {
   return rest.some(element => element < 0);
 }
 
+const getDistanceBetweenTwoPoints = (Ax, Ay, Bx, By) => {
+  return Math.sqrt((Ax - Bx) ** 2 + (Ay - By) ** 2);
+}
 const useReadLine = (A, B) => {
   const readline = require('readline');
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
-  console.log('> 좌표를 입력하세요.');
+  console.log('> 좌표를 입력하세요. 0 < x,y <= 24');
   console.log('ex) (10,10)-(14,15)');
-  rl.setPrompt('> 잘못 입력하셨습니다. 다시 입력해주세요.');
-  rl.prompt();
   rl.on("line", (line) => {
     [A.x, A.y, B.x, B.y] = inputDivision(line);
-    if (!checkNegative(A.x, A.y, B.x, B.y)){
-      
-    }
-
+    if (!checkNegative(A.x, A.y, B.x, B.y)) {
+      const straightLength = getDistanceBetweenTwoPoints(A.x, A.y, B.x, B.y);
+      console.log(straightLength);
       rl.close();
+    } else {
+      rl.setPrompt('> 잘못 입력하셨습니다. 다시 입력해주세요.');
+      rl.prompt();
+      console.log();
+    }
   })
   rl.on("close", () => {
     process.exit();
@@ -60,6 +65,4 @@ const useReadLine = (A, B) => {
 
 const A = new Location();
 const B = new Location();
-// useReadLine(A, B);
-
-console.log(inputDivision('(10,10)-(14,15)'));
+useReadLine(A, B);
