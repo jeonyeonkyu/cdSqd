@@ -21,6 +21,10 @@ class Location {
   }
 }
 
+const checkNegative = (...rest) => {
+  return rest.some(element => element.x < 0 && element.y < 0);
+}
+
 const inputDivision = (word) => {
   const wordArray = word.split('-');
   const divisionArray = wordArray.map(element => {
@@ -31,26 +35,37 @@ const inputDivision = (word) => {
   return divisionArray;
 }
 
-const checkNegative = (...rest) => {
-  return rest.some(element => element < 0);
+const getDistanceBetweenTwoPoints = (location1, location2) => {
+  return Math.sqrt((location1.x - location2.x) ** 2 + (location1.y - location2.y) ** 2);
 }
 
-const getDistanceBetweenTwoPoints = (Ax, Ay, Bx, By) => {
-  return Math.sqrt((Ax - Bx) ** 2 + (Ay - By) ** 2);
+const getTriangleArea = (location1, location2, location3) => {
+  const side1 = getDistanceBetweenTwoPoints(location1, location2);
+  const side2 = getDistanceBetweenTwoPoints(location1, location3);
+  const side3 = getDistanceBetweenTwoPoints(location2, location3);
+  const half = (side1 + side2 + side3) / 2;
+  return Math.sqrt(half * (half - side1) * (half - side2) * (half - side3));
 }
-const useReadLine = (A, B) => {
+
+const useReadLine = (Location) => {
   const readline = require('readline');
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
-  console.log('> 좌표를 입력하세요. 0 < x,y <= 24');
-  console.log('ex) (10,10)-(14,15)');
+  console.log('> 좌표를 입력하세요.');
+  console.log('제한)  0 < x, y <= 24')
+  console.log('ex) 직선거리 구하기 (10,10)-(14,15)');
+  console.log('ex) 삼각형 넓이 구하기 (10,10)-(14,15)-(20,8)');
+  console.log('ex) 사각형 넓이 구하기 (10,10)-(22,10)-(22,18)-(10,18)');
   rl.on("line", (line) => {
-    [A.x, A.y, B.x, B.y] = inputDivision(line);
-    if (!checkNegative(A.x, A.y, B.x, B.y)) {
-      const straightLength = getDistanceBetweenTwoPoints(A.x, A.y, B.x, B.y);
-      console.log(`'''두 점사이의 거리는 ${straightLength}'''`);
+    const location = inputDivision(line)
+      .map(array => array = new Location(array[0], array[1]));
+    if (!checkNegative(...location)) {
+      // const straightLength = getDistanceBetweenTwoPoints(location[0], location[1]);
+      // console.log(`'''두 점사이의 거리는 ${straightLength}'''`);
+      const triangleArea = getTriangleArea(location[0], location[1], location[2]);
+      console.log(triangleArea);
       rl.close();
     } else {
       console.log('> 잘못 입력하셨습니다. 다시 입력해주세요.');
@@ -61,8 +76,4 @@ const useReadLine = (A, B) => {
   })
 }
 
-const A = new Location();
-const B = new Location();
-// useReadLine(A, B);
-
-console.log(inputDivision('(10,20)-(20,30)-(20,10)'))
+useReadLine(Location);
