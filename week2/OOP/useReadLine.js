@@ -2,6 +2,7 @@ const Location = require('./Location.js');
 const Straight = require('./Straight.js');
 const Triangle = require('./Triangle.js');
 const Square = require('./Square.js');
+const View = require('./View.js');
 
 class UseReadLine {
   constructor() {
@@ -69,6 +70,8 @@ class UseReadLine {
       }
       const location = this.convertInputToArray(line)
         .map(element => element = new Location(element[0], element[1]));
+      const view = new View(location, 24);
+      view.drawTable();
       if (!this.checkNegative(...location)) {
         this.chooseShape(location);
       } else {
