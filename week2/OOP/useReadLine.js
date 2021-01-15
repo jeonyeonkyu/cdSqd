@@ -42,11 +42,11 @@ class UseReadLine {
     switch (location.length) {
       case 2:
         const straight = new Straight();
-        console.log(`'''두 점사이의 거리는 ${straight.getDistanceBetweenTwoPoints(location)}'''`);
+        console.log(`'''두 점사이의 거리는 ${straight.getDistanceBetweenTwoPoints(location).toFixed(6)}'''`);
         break;
       case 3:
         const triangle = new Triangle();
-        console.log(`'''삼각형 넓이는 ${triangle.getTriangleArea(location)}'''`);
+        console.log(`'''삼각형 넓이는 ${triangle.getTriangleArea(location).toFixed(1)}'''`);
         break;
       case 4:
         const square = new Square();
