@@ -5,7 +5,7 @@ const videoListGenerator = require('./VideoListGenerator');
 const InputModule = require('./InputModule.js');
 
 const myVideoList = [];
-for(let i = 0; i < 13; i++) {
+for (let i = 0; i < 13; i++) {
   myVideoList.push(new MyVideoData({ uniqueIdGenerator, titleGenerator }));
 }
 console.log('---영상 클립---');
