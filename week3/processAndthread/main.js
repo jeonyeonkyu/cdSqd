@@ -41,8 +41,6 @@ class Model {
       this.threadArray[index].on('message', resolve);
     });
   }
-
-
 }
 
 class View {
@@ -97,7 +95,6 @@ class View {
     this.model.getWorkersMessage(index).then(v => {
       const [name, state, count, target] = v.split(',');
       console.log(`${name}(${state}), ${count} / ${target}sec`);
-
       if (state === 'terminate') {
         this.finishSet.add(name);
       }
