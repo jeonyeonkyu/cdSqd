@@ -1,10 +1,20 @@
 const { parentPort } = require('worker_threads');
-const processA = { target: 1, count: 0 };
+const processA = { name: 'A', state: 'ready', count: 0, target: 3 };
 
 parentPort.on('message', (msg) => {
-  processA.count += msg.count;
-  if (processA.target === processA.count) {
-    console.log('workerA는 끝~');
-    parentPort.postMessage('A');
+  if (processA.count === processA.target) {
+    processA.state = 'terminate';
+    parentPort.postMessage(`${processA.name},${processA.state},${processA.count},${processA.target}`);
+    return;
   }
+
+  if (msg.count === 1) {
+    processA.count += msg.count;
+    processA.state = 'running';
+    parentPort.postMessage(`${processA.name},${processA.state},${processA.count},${processA.target}`);
+    processA.state = 'waiting';
+    return;
+  }
+
+  parentPort.postMessage(`${processA.name},${processA.state},${processA.count},${processA.target}`);
 });
