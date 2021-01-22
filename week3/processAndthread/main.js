@@ -1,10 +1,9 @@
-const { Worker, isMainThread } = require('worker_threads');
+const { Worker } = require('worker_threads');
 
 const workerA = new Worker('./workerA.js');
 const workerB = new Worker('./workerB.js');
 const workerC = new Worker('./workerC.js');
 const workerD = new Worker('./workerD.js');
-console.log('isMainThread:', isMainThread); // true
 
 class Model {
   constructor(workerA, workerB, workerC, workerD) {
@@ -21,26 +20,22 @@ class Model {
     return [...this.threadArray];
   }
 
-  doWork() {
-    Object.keys(this.threadArray[0]).postMessage(this.workStuff);
+  doWork(index) {
+    this.threadArray[index][Object.keys(this.threadArray[index])].postMessage(this.workStuff);
   }
 
-  // statusLookup() {
-  //   workerA.on('message', (msg) => {
-  //     //   console.log(msg);
-  //     // })
-  //   })
-  // }
+  getWorkersMessage() {
+    return new Promise(resolve => {
+      this.threadArray[index][Object.keys(this.threadArray[index])].on('message', resolve);
+    });
+  }
+
+
 }
 
 class View {
   constructor(model) {
     this.model = model;
-  }
-
-  sleep(delay) {
-    const startTime = new Date().getTime();
-    while (new Date().getTime() < startTime + delay);
   }
 
   render() {
@@ -49,26 +44,8 @@ class View {
 }
 
 const model = new Model(workerA, workerB, workerC, workerD);
-model.cutRandomThreadArray(3);
-console.log(model.getThreadArray())
+// model.cutRandomThreadArray(3);
+// console.log(model.getThreadArray())
 
-
-
-// workerA.on('message', (msg) => {
-//   console.log(msg);
-// });
-
-// workerB.postMessage('message from mainThread');
-
-// workerB.on('message', (msg) => {
-//   console.log(msg);
-// });
-// workerC.on('message', (msg) => {
-//   console.log(msg);
-// });
-// workerD.on('message', (msg) => {
-//   console.log(msg);
-// });
-
-
+model.doWork();
 // process.exit()
