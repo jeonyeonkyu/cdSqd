@@ -7,30 +7,38 @@
 const EventEmitter = require('events');
 const emitter = new EventEmitter();
 
-let customerNumber = 0;
-emitter.on('message', (msg, msg2) => {
-  console.log('casll');
-  console.log(msg)
-  console.log(msg2)
-})
-
-class OrderWaitingTable {
+class OrderWaitingTable { //queue테이블
   constructor() {
-    this.queue = [];
+    this.list = [];
   }
 
   add(data) {
-    this.queue.push(data);
+    this.list.push(data);
   }
 
   delete() {
-    this.queue.shift();
+    this.list.shift();
+  }
+
+  getList() {
+    return [...this.list];
   }
 }
 
 class Cashier {
-  constructor() {
+  constructor(orderWaitingTable) {
+    this.table = orderWaitingTable;
+  }
 
+  init() {
+    this.addToOrderList();
+  }
+
+  addToOrderList() {
+    emitter.on('order', (customerNumber, drinkType, drinkCount) => {
+      const orderDetails = { customerNumber, drinkType, drinkCount };
+      this.table.add(orderDetails);
+    })
   }
 
 
@@ -40,9 +48,6 @@ class Manager {
   constructor() {
 
   }
-
-
-
 }
 
 class DashBoard {
@@ -78,9 +83,8 @@ class OrderModule {
 
   receiveInput() { //입력받은 문자열 읽기
     this.rl.on("line", (line) => {
-      const [drinkType, drinkCount] = line.split(':');
-      console.log(line);
-      emitter.emit('order', ++customerNumber, drinkType, drinkCount);
+      const [drinkType, drinkCount] = line.split(':').map(Number);
+      emitter.emit('order', ++this.customerNumber, drinkType, drinkCount);
       this.rl.prompt();
       // this.rl.close();
     })
@@ -93,5 +97,8 @@ class OrderModule {
   }
 }
 
+const orderWaitingTable = new OrderWaitingTable();
+const cashier = new Cashier(orderWaitingTable);
+cashier.init();
 const orderModule = new OrderModule();
 orderModule.init();
