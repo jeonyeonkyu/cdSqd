@@ -4,27 +4,45 @@
 //바리스타 동시에 2개까지 음료 만들수 잇음 음료 만들기 시작, 음료만들기 끝 에대한 이벤트
 //현황판 음료가 대기중인지 제작중인지 완료인지 출력 < 매니저가 확인해야할듯
 
-// const EventEmitter = require('events');
-// const emitter = new EventEmitter();
+const EventEmitter = require('events');
+const emitter = new EventEmitter();
 
-// let customerNumber = 0;
-// emitter.on('message', (msg, msg2) => {
-//   console.log('casll');
-//   console.log(msg)
-//   console.log(msg2)
-// })
-// emitter.emit('message', ++customerNumber, '1:3');
+let customerNumber = 0;
+emitter.on('message', (msg, msg2) => {
+  console.log('casll');
+  console.log(msg)
+  console.log(msg2)
+})
+
+class OrderWaitingTable {
+  constructor() {
+    this.queue = [];
+  }
+
+  add(data) {
+    this.queue.push(data);
+  }
+
+  delete() {
+    this.queue.shift();
+  }
+}
 
 class Cashier {
   constructor() {
 
   }
+
+
 }
 
 class Manager {
   constructor() {
 
   }
+
+
+
 }
 
 class DashBoard {
@@ -46,6 +64,7 @@ class OrderModule {
       input: process.stdin,
       output: process.stdout
     });
+    this.customerNumber = 0;
   }
 
   init() {
@@ -59,8 +78,10 @@ class OrderModule {
 
   receiveInput() { //입력받은 문자열 읽기
     this.rl.on("line", (line) => {
+      const [drinkType, drinkCount] = line.split(':');
+      console.log(line);
+      emitter.emit('order', ++customerNumber, drinkType, drinkCount);
       this.rl.prompt();
-      console.log(line)
       // this.rl.close();
     })
   }
