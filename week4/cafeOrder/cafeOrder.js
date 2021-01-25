@@ -46,32 +46,60 @@ class Manager {
   constructor(orderWaitingTable, barista) {
     this.table = orderWaitingTable;
     this.barista = barista;
+    this.waitingDrink = [];
   }
 
   init() {
-    this.orderStatusCheck();
+    this.orderStatusConfirm();
   }
 
-  orderStatusCheck() {
+  orderStatusConfirm() {
     const self = this;
     let timeId = setTimeout(function tick() {
-      const newOrder = self.table.list.filter(order => order.checked === false);
-      if (!newOrder) {
+      self.newOrderConfirm();
+      if (!self.waitingDrink) {
         timeId = setTimeout(tick, 1000);
         return;
       }
-      for (let i = self.barista.work.length, j = 0; i < 2 && newOrder[j]; i++, j++) {
-        self.barista.work.push(newOrder[j]);
-        newOrder[j].checked = true;
+      for (let i = self.barista.work.length; i < 2 && self.waitingDrink[0]; i++) {
+        self.barista.work.push({
+          customerNumber: self.waitingDrink[0].customerNumber,
+          drinkType: self.waitingDrink[0].drinkType
+        });
+        self.waitingDrink.shift();
       }
+      self.dashBoardUpdate();
       timeId = setTimeout(tick, 1000);
     }, 1000)
   }
 
+  newOrderConfirm() {
+    const newOrder = this.table.list.filter(order => order.checked === false);
+    newOrder.forEach(item => {
+      for (let i = 0; i < item.drinkCount; i++) {
+        this.waitingDrink.push(item);
+      }
+    })
+    newOrder.forEach(order => order.checked = true);
+  }
+
+  dashBoardUpdate() {
+    emitter.emit('dashBoardUpdate', this.table.list);
+  }
 }
 
 class DashBoard {
   constructor() {
+    this.dashBoard = null;
+  }
+
+  confirm() {
+    emitter.on('dashBoardUpdate', (list) => {
+      // console.log(list)
+    })
+  }
+
+  show() {
 
   }
 }
@@ -80,36 +108,41 @@ class Barista {
   constructor() {
     this.work = [];
     this.drinkMakeTime = { 1: 3, 2: 5, 3: 10 };
-    this.drinkKinds = ['아메리카노', '카페라떼', '프라프치노'];
+    this.drinkKinds = [, '아메리카노', '카페라떼', '프라프치노'];
   }
 
   init() {
     this.doWork();
   }
+
   doWork() {
     const self = this;
     let timeId = setTimeout(function tick() {
-      self.work.forEach(item => {
-        console.log(item);
-        if (!item.progress) {
-          item.progress = 0;
-          self.printMakeStart(item.drinkType);
-        }
-        item.progress++;
-        if (self.drinkMakeTime[item.drinkType] === item.progress) {
-          self.printMakeEnd(item.drinkType);
-        }
-      })
+      self.makeStart();
+      self.makeEnd();
       timeId = setTimeout(tick, 1000);
     })
   }
 
-  printMakeStart(drinkType) {
-    console.log(`${this.drinkKinds[drinkType - 1]} 시작`);
+  makeStart() {
+    this.work.forEach(item => {
+      console.log(item)
+      if (!item.progress) {
+        item.progress = 0;
+        console.log(`${this.drinkKinds[item.drinkType]} 시작`);
+      }
+      item.progress++;
+    })
   }
 
-  printMakeEnd(drinkType) {
-    console.log(`${this.drinkKinds[drinkType - 1]} 완성`);
+  makeEnd() {
+    for (let i = 0; i < this.work.length; i++) {
+      if (this.drinkMakeTime[this.work[i].drinkType] === this.work[i].progress) {
+        console.log(`${this.drinkKinds[this.work[i].drinkType]} 완성`);
+        this.work.splice(i, 1);
+        i--;
+      }
+    }
   }
 }
 
@@ -155,5 +188,7 @@ const barista = new Barista();
 const manager = new Manager(orderWaitingTable, barista);
 manager.init();
 barista.init();
+const dashBoard = new DashBoard();
+dashBoard.confirm();
 const orderModule = new OrderModule();
 orderModule.init();
