@@ -35,19 +35,39 @@ class Cashier {
   }
 
   addToOrderList() {
-    emitter.on('order', (customerNumber, drinkType, drinkCount) => {
-      const orderDetails = { customerNumber, drinkType, drinkCount };
+    emitter.on('takeOrder', (customerNumber, drinkType, drinkCount) => {
+      const orderDetails = { customerNumber, drinkType, drinkCount, checked: false };
       this.table.add(orderDetails);
     })
   }
-
-
 }
 
 class Manager {
-  constructor() {
-
+  constructor(orderWaitingTable, barista) {
+    this.table = orderWaitingTable;
+    this.barista = barista;
   }
+
+  init() {
+    this.orderStatusCheck();
+  }
+
+  orderStatusCheck() {
+    const self = this;
+    let timeId = setTimeout(function tick() {
+      const newOrder = self.table.list.filter(order => order.checked === false);
+      if (!newOrder) {
+        timeId = setTimeout(tick, 1000);
+        return;
+      }
+      for (let i = self.barista.work.length, j = 0; i < 2 && newOrder[j]; i++, j++) {
+        self.barista.work.push(newOrder[j]);
+        newOrder[j].checked = true;
+      }
+      timeId = setTimeout(tick, 1000);
+    }, 1000)
+  }
+
 }
 
 class DashBoard {
@@ -58,7 +78,38 @@ class DashBoard {
 
 class Barista {
   constructor() {
+    this.work = [];
+    this.drinkMakeTime = { 1: 3, 2: 5, 3: 10 };
+    this.drinkKinds = ['아메리카노', '카페라떼', '프라프치노'];
+  }
 
+  init() {
+    this.doWork();
+  }
+  doWork() {
+    const self = this;
+    let timeId = setTimeout(function tick() {
+      self.work.forEach(item => {
+        console.log(item);
+        if (!item.progress) {
+          item.progress = 0;
+          self.printMakeStart(item.drinkType);
+        }
+        item.progress++;
+        if (self.drinkMakeTime[item.drinkType] === item.progress) {
+          self.printMakeEnd(item.drinkType);
+        }
+      })
+      timeId = setTimeout(tick, 1000);
+    })
+  }
+
+  printMakeStart(drinkType) {
+    console.log(`${this.drinkKinds[drinkType - 1]} 시작`);
+  }
+
+  printMakeEnd(drinkType) {
+    console.log(`${this.drinkKinds[drinkType - 1]} 완성`);
   }
 }
 
@@ -84,7 +135,7 @@ class OrderModule {
   receiveInput() { //입력받은 문자열 읽기
     this.rl.on("line", (line) => {
       const [drinkType, drinkCount] = line.split(':').map(Number);
-      emitter.emit('order', ++this.customerNumber, drinkType, drinkCount);
+      emitter.emit('takeOrder', ++this.customerNumber, drinkType, drinkCount);
       this.rl.prompt();
       // this.rl.close();
     })
@@ -100,5 +151,9 @@ class OrderModule {
 const orderWaitingTable = new OrderWaitingTable();
 const cashier = new Cashier(orderWaitingTable);
 cashier.init();
+const barista = new Barista();
+const manager = new Manager(orderWaitingTable, barista);
+manager.init();
+barista.init();
 const orderModule = new OrderModule();
 orderModule.init();
