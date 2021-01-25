@@ -41,9 +41,36 @@ class Barista {
 
 class OrderModule {
   constructor() {
+    this.readline = require('readline');
+    this.rl = this.readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+  }
 
+  init() {
+    console.log('>메뉴  =  1. 아메리카노(3s)    2. 카페라떼(5s)    3. 프라프치노(10s)');
+    console.log('> 주문할 음료를 입력하세요. 예) 아메리카노 2개 => 1:2');
+    this.rl.setPrompt('입력> ');
+    this.rl.prompt();
+    this.receiveInput();
+    this.closeModule();
+  }
+
+  receiveInput() { //입력받은 문자열 읽기
+    this.rl.on("line", (line) => {
+      this.rl.prompt();
+      console.log(line)
+      // this.rl.close();
+    })
+  }
+
+  closeModule() { //모듈 종료
+    this.rl.on("close", () => {
+      process.exit();
+    })
   }
 }
 
-
-
+const orderModule = new OrderModule();
+orderModule.init();
