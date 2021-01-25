@@ -40,6 +40,7 @@ class Cashier {
       this.table.add(orderDetails);
     })
   }
+
 }
 
 class Manager {
@@ -67,6 +68,9 @@ class Manager {
           i--;
         }
       }
+      const finishOrder = this.table.list.find(order => order.customerNumber === oneDrink.customerNumber);
+      finishOrder.complete = true;
+      this.dashBoardUpdate(finishOrder);
     })
   }
 
@@ -86,7 +90,7 @@ class Manager {
         });
         self.waitingDrink.shift();
       }
-      self.dashBoardUpdate();
+
       timeId = setTimeout(tick, 1000);
     }, 1000)
   }
@@ -101,26 +105,42 @@ class Manager {
     newOrder.forEach(order => order.checked = true);
   }
 
-
-
-  dashBoardUpdate() {
-    emitter.emit('dashBoardUpdate', this.table.list);
+  dashBoardUpdate(finishOrder) {
+    emitter.emit('dashBoardUpdate', finishOrder);
   }
 }
 
 class DashBoard {
-  constructor() {
-    this.dashBoard = null;
+  constructor(orderWaitingTable) {
+    this.table = orderWaitingTable;
+    this.drinkKinds = [, '아메리카노', '카페라떼', '프라프치노'];
   }
 
-  confirm() {
+  init() {
+    this.callCustomer();
+    this.show();
+  }
+
+  callCustomer() {
     emitter.on('dashBoardUpdate', (list) => {
-      // console.log(list)
+      console.log(`${list.customerNumber}번 손님~ 주문하신 ${this.drinkKinds[list.drinkType]} ${list.drinkCount}개 나왔습니다~`);
     })
   }
 
   show() {
+    const self = this;
+    let timeId = setTimeout(function tick() {
+      console.log('###############   현     황     판 ################')
+      console.log(`┌──────────┬───────────┬───────────┬──────────────┐`);
+      console.log(`│ (number) │  (order)  │  (count)  │   (status)   │`);
+      console.log(`├──────────┼───────────┼───────────┼──────────────┤`);
+      self.table.list.forEach((item) => {
+        console.log(`│    ${item.customerNumber}     │ ${self.drinkKinds[item.drinkType]}│     ${item.drinkCount}     │     ${item.complete ? '완료' : '대기'}     │`);
+      });
+      console.log(`└──────────┴───────────┴───────────┴──────────────┘`);
 
+      timeId = setTimeout(tick, 5000);
+    }, 5000)
   }
 }
 
@@ -168,7 +188,6 @@ class Barista {
   informDone(oneDrink) {
     emitter.emit('finishOne', oneDrink);
   }
-
 }
 
 class OrderModule {
@@ -194,7 +213,6 @@ class OrderModule {
     this.rl.on("line", (line) => {
       const [drinkType, drinkCount] = line.split(':').map(Number);
       emitter.emit('takeOrder', ++this.customerNumber, drinkType, drinkCount);
-      this.rl.prompt();
       // this.rl.close();
     })
   }
@@ -211,9 +229,9 @@ const cashier = new Cashier(orderWaitingTable);
 cashier.init();
 const barista = new Barista();
 const manager = new Manager(orderWaitingTable, barista);
-manager.init();
 barista.init();
-const dashBoard = new DashBoard();
-dashBoard.confirm();
+manager.init();
+const dashBoard = new DashBoard(orderWaitingTable);
+dashBoard.init();
 const orderModule = new OrderModule();
 orderModule.init();
