@@ -47,10 +47,27 @@ class Manager {
     this.table = orderWaitingTable;
     this.barista = barista;
     this.waitingDrink = [];
+    this.finishOneOrder = [];
   }
 
   init() {
     this.orderStatusConfirm();
+    this.takeBaristaMade();
+  }
+
+  takeBaristaMade() {
+    emitter.on('finishOne', oneDrink => {
+      this.finishOneOrder.push(oneDrink);
+      const finishDrink = this.finishOneOrder
+        .filter(item => item.customerNumber === oneDrink.customerNumber);
+      if (finishDrink.length !== finishDrink[0].drinkCount) return;
+      for (let i = 0; i < this.finishOneOrder.length; i++) {
+        if (this.finishOneOrder[i].customerNumber === oneDrink.customerNumber) {
+          this.finishOneOrder.splice(i, 1);
+          i--;
+        }
+      }
+    })
   }
 
   orderStatusConfirm() {
@@ -64,7 +81,8 @@ class Manager {
       for (let i = self.barista.work.length; i < 2 && self.waitingDrink[0]; i++) {
         self.barista.work.push({
           customerNumber: self.waitingDrink[0].customerNumber,
-          drinkType: self.waitingDrink[0].drinkType
+          drinkType: self.waitingDrink[0].drinkType,
+          drinkCount: self.waitingDrink[0].drinkCount
         });
         self.waitingDrink.shift();
       }
@@ -82,6 +100,8 @@ class Manager {
     })
     newOrder.forEach(order => order.checked = true);
   }
+
+
 
   dashBoardUpdate() {
     emitter.emit('dashBoardUpdate', this.table.list);
@@ -126,7 +146,6 @@ class Barista {
 
   makeStart() {
     this.work.forEach(item => {
-      console.log(item)
       if (!item.progress) {
         item.progress = 0;
         console.log(`${this.drinkKinds[item.drinkType]} 시작`);
@@ -139,11 +158,17 @@ class Barista {
     for (let i = 0; i < this.work.length; i++) {
       if (this.drinkMakeTime[this.work[i].drinkType] === this.work[i].progress) {
         console.log(`${this.drinkKinds[this.work[i].drinkType]} 완성`);
+        this.informDone(this.work[i]);
         this.work.splice(i, 1);
         i--;
       }
     }
   }
+
+  informDone(oneDrink) {
+    emitter.emit('finishOne', oneDrink);
+  }
+
 }
 
 class OrderModule {
