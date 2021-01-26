@@ -82,17 +82,21 @@ class Manager {
         timeId = setTimeout(tick, 1000);
         return;
       }
-      for (let i = self.barista.work.length; i < 2 && self.waitingDrink[0]; i++) {
-        self.barista.work.push({
-          customerNumber: self.waitingDrink[0].customerNumber,
-          drinkType: self.waitingDrink[0].drinkType,
-          drinkCount: self.waitingDrink[0].drinkCount
-        });
-        self.waitingDrink.shift();
-      }
-
+      self.doWorkCallBaristas();
       timeId = setTimeout(tick, 1000);
     }, 1000)
+  }
+
+  doWorkCallBaristas() {
+    for (let i = this.barista.work.length; i < 2 && this.waitingDrink[0]; i++) {
+      this.barista.work.push({
+        customerNumber: this.waitingDrink[0].customerNumber,
+        drinkType: this.waitingDrink[0].drinkType,
+        drinkCount: this.waitingDrink[0].drinkCount
+      });
+      this.inProduction(this.waitingDrink[0].customerNumber);
+      this.waitingDrink.shift();
+    }
   }
 
   newOrderConfirm() {
@@ -104,6 +108,12 @@ class Manager {
     })
     newOrder.forEach(order => order.checked = true);
   }
+
+  inProduction(nowCustomerNumber) { //제작중인 상태 알리기
+    const nowOrder = this.table.list.find(order => order.customerNumber === nowCustomerNumber);
+    nowOrder.production = true;
+  }
+
 
   dashBoardUpdate(finishOrder) {
     emitter.emit('dashBoardUpdate', finishOrder);
@@ -135,7 +145,7 @@ class DashBoard {
       console.log(`│ (number) │  (order)  │  (count)  │   (status)   │`);
       console.log(`├──────────┼───────────┼───────────┼──────────────┤`);
       self.table.list.forEach((item) => {
-        console.log(`│    ${item.customerNumber}     │ ${self.drinkKinds[item.drinkType]}│     ${item.drinkCount}     │     ${item.complete ? '완료' : '대기'}     │`);
+        console.log(`│    ${item.customerNumber}     │ ${self.drinkKinds[item.drinkType]}│     ${item.drinkCount}     │     ${item.complete ? '완료' : item.production ? '제작' : '대기'}     │`);
       });
       console.log(`└──────────┴───────────┴───────────┴──────────────┘`);
 
