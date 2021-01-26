@@ -29,8 +29,8 @@ class Cashier {
   }
 
   addToOrderList() {
-    emitter.on('takeOrder', (customerNumber, drinkType, drinkCount) => {
-      const orderDetails = { customerNumber, drinkType, drinkCount, checked: false };
+    emitter.on('takeOrder', (customerNumber, drinkType, drinkCount, totalCount) => {
+      const orderDetails = { customerNumber, drinkType, drinkCount, totalCount, checked: false };
       this.table.add(orderDetails);
     })
   }
@@ -38,9 +38,9 @@ class Cashier {
 }
 
 class Manager {
-  constructor(orderWaitingTable, barista) {
+  constructor(orderWaitingTable, baristas) {
     this.table = orderWaitingTable;
-    this.barista = barista;
+    this.baristas = baristas;
     this.waitingDrink = [];
     this.finishOneOrder = [];
   }
@@ -55,15 +55,15 @@ class Manager {
       this.finishOneOrder.push(oneDrink);
       const finishDrink = this.finishOneOrder
         .filter(item => item.customerNumber === oneDrink.customerNumber);
-      if (finishDrink.length !== finishDrink[0].drinkCount) return;
+      if (finishDrink.length !== finishDrink[0].totalCount) return;
       for (let i = 0; i < this.finishOneOrder.length; i++) {
         if (this.finishOneOrder[i].customerNumber === oneDrink.customerNumber) {
           this.finishOneOrder.splice(i, 1);
           i--;
         }
       }
-      const finishOrder = this.table.list.find(order => order.customerNumber === oneDrink.customerNumber);
-      finishOrder.complete = true;
+      const finishOrder = this.table.list.filter(order => order.customerNumber === oneDrink.customerNumber);
+      finishOrder.forEach(item => item.complete = true);
       this.dashBoardUpdate(finishOrder);
     })
   }
@@ -76,17 +76,29 @@ class Manager {
         timeId = setTimeout(tick, 1000);
         return;
       }
-      for (let i = self.barista.work.length; i < 2 && self.waitingDrink[0]; i++) {
-        self.barista.work.push({
-          customerNumber: self.waitingDrink[0].customerNumber,
-          drinkType: self.waitingDrink[0].drinkType,
-          drinkCount: self.waitingDrink[0].drinkCount
-        });
-        self.waitingDrink.shift();
-      }
-
+      self.doWorkCallBaristas();
       timeId = setTimeout(tick, 1000);
     }, 1000)
+  }
+
+  doWorkCallBaristas() {
+    this.baristas.forEach(barista => {
+      for (let i = barista.work.length; i < 2 && this.waitingDrink[0]; i++) {
+        barista.work.push({
+          customerNumber: this.waitingDrink[0].customerNumber,
+          drinkType: this.waitingDrink[0].drinkType,
+          drinkCount: this.waitingDrink[0].drinkCount,
+          totalCount: this.waitingDrink[0].totalCount
+        });
+        this.inProduction(this.waitingDrink[0].customerNumber);
+        this.waitingDrink.shift();
+      }
+    })
+  }
+
+  inProduction(nowCustomerNumber) {
+    const nowOrder = this.table.list.find(order => order.customerNumber === nowCustomerNumber);
+    nowOrder.production = true;
   }
 
   newOrderConfirm() {
@@ -117,7 +129,9 @@ class DashBoard {
 
   callCustomer() {
     emitter.on('dashBoardUpdate', (list) => {
-      console.log(`${list.customerNumber}번 손님~ 주문하신 ${this.drinkKinds[list.drinkType]} ${list.drinkCount}개 나왔습니다~`);
+      const customerNumber = list[0].customerNumber;
+      const totalCount = list[0].totalCount;
+      console.log(`${customerNumber} 손님~ 주문하신 음료 ${totalCount}잔~ 나왔습니다~`);
     })
   }
 
@@ -129,7 +143,7 @@ class DashBoard {
       console.log(`│ (number) │  (order)  │  (count)  │   (status)   │`);
       console.log(`├──────────┼───────────┼───────────┼──────────────┤`);
       self.table.list.forEach((item) => {
-        console.log(`│    ${item.customerNumber}     │ ${self.drinkKinds[item.drinkType]}│     ${item.drinkCount}     │     ${item.complete ? '완료' : '대기'}     │`);
+        console.log(`│    ${item.customerNumber}     │ ${self.drinkKinds[item.drinkType]}│     ${item.drinkCount}     │     ${item.complete ? '완료' : item.production ? '제작' : '대기'}     │`);
       });
       console.log(`└──────────┴───────────┴───────────┴──────────────┘`);
 
@@ -139,7 +153,8 @@ class DashBoard {
 }
 
 class Barista {
-  constructor() {
+  constructor(name) {
+    this.name = name;
     this.work = [];
     this.drinkMakeTime = { 1: 3, 2: 5, 3: 10 };
     this.drinkKinds = [, '아메리카노', '카페라떼', '프라프치노'];
@@ -162,7 +177,7 @@ class Barista {
     this.work.forEach(item => {
       if (!item.progress) {
         item.progress = 0;
-        console.log(`${this.drinkKinds[item.drinkType]} 시작`);
+        console.log(`바리스타${this.name}-${item.customerNumber}${this.drinkKinds[item.drinkType]} 시작`);
       }
       item.progress++;
     })
@@ -171,7 +186,7 @@ class Barista {
   makeEnd() {
     for (let i = 0; i < this.work.length; i++) {
       if (this.drinkMakeTime[this.work[i].drinkType] === this.work[i].progress) {
-        console.log(`${this.drinkKinds[this.work[i].drinkType]} 완성`);
+        console.log(`바리스타${this.name}-${this.work[i].customerNumber}${this.drinkKinds[this.work[i].drinkType]} 완성`);
         this.informDone(this.work[i]);
         this.work.splice(i, 1);
         i--;
@@ -191,7 +206,6 @@ class OrderModule {
       input: process.stdin,
       output: process.stdout
     });
-    this.customerNumber = 0;
   }
 
   init() {
@@ -206,10 +220,11 @@ class OrderModule {
   receiveInput() { //입력받은 문자열 읽기
     this.rl.on("line", (line) => {
       const input = line.split(', ');
-      const customer = input.shift();
+      const customerNumber = input.shift();
+      const totalCount = input.reduce((acc, cur) => acc + Number(cur.slice(-1)), 0);
       input.forEach(item => {
         const [drinkType, drinkCount] = item.split(':').map(Number);
-        emitter.emit('takeOrder', customer, drinkType, drinkCount);
+        emitter.emit('takeOrder', customerNumber, drinkType, drinkCount, totalCount);
       })
       // this.rl.close();
     })
@@ -222,12 +237,16 @@ class OrderModule {
   }
 }
 
+const makeBaristas = (num) => {
+  return Array.from({ length: num }, (_, i) => new Barista(i + 1));
+}
+
 const orderWaitingTable = new OrderWaitingTable();
 const cashier = new Cashier(orderWaitingTable);
 cashier.init();
-const barista = new Barista();
-const manager = new Manager(orderWaitingTable, barista);
-barista.init();
+const baristas = makeBaristas(4);
+baristas.forEach(e => e.init());
+const manager = new Manager(orderWaitingTable, baristas);
 manager.init();
 const dashBoard = new DashBoard(orderWaitingTable);
 dashBoard.init();
