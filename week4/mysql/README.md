@@ -99,11 +99,19 @@ CONCAT(CHAR(FLOOR(RAND() * 1000 % 26) + 65),CHAR(FLOOR(RAND() * 1000 % 26) + 65)
 call makeData();
 ```
 
-이후 40분째 먹통이다
+이후 1시간째 먹통이다....
 
 
+너무 오래걸려서 그만 했다 인터넷의 글을 보니 13시간 걸렸다고 한 글이 있어서 autocommit을 해제하고 하니 2분정도 후에 완료되었다
 
-처음에 테스트한 1000개의 데이터만 캡쳐해봤다.. (이건 10초 걸렸다)
+![image](https://user-images.githubusercontent.com/61257242/106126842-3dd61000-61a1-11eb-9a19-8bb8614038b7.png)
 
-![화면 캡처 2021-01-28 172937](https://user-images.githubusercontent.com/61257242/106117547-7d4b2f00-6196-11eb-8548-cc3735b94b7d.png)
+[autocommit해제링크](https://slobell.com/blogs/41)
+[13시간 걸린 글](https://m.blog.naver.com/PostView.nhn?blogId=bbh1988&logNo=220315268988&proxyReferer=https:%2F%2Fwww.google.com%2F)
+
+처음에 autocommit 되어있는상태로 돌리다가 강제종료했는데 23만건이 들어가있어서 총 123만건이 되었다
+
+![ezgif com-gif-maker (3)](https://user-images.githubusercontent.com/61257242/106129037-3dd70f80-61a3-11eb-9764-8e1b0dfa1682.gif)
+
+
 
