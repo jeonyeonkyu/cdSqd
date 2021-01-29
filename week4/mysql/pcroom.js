@@ -45,6 +45,9 @@ const quitUser = async (nickname) => {
   await runMysql(`update PCROOM set endtime = '${getNowDate()}' where nickname = '${nickname}'`);
 }
 
+const getLastUserKey = async () => {
+  return await runMysql(`select MAX(id) from PCROOM`);
+}
 
 // insertNewUser('aaB');
 quitUser('new');
