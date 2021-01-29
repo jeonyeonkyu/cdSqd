@@ -28,8 +28,8 @@ const insertNewUser = async (nickname, seatNumber) => {
   await runMysql(`update PCSEAT set in_use = '1' where seatnumber = ${seatNumber}`);
 }
 
-const quitUser = async (nickname) => {
-  await runMysql(`update PCROOM set endtime = '${getNowDate()}' where nickname = '${nickname}'`);
+const getUserSeat = async (nickname) => {
+  return await runMysql(`select seatnumber from PCROOM where nickname = '${nickname}'`);
 }
 
 const getNowDate = () => {
@@ -38,6 +38,14 @@ const getNowDate = () => {
   const [hours, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+
+const quitUser = async (nickname) => {
+  const userSeat = await getUserSeat();
+  await runMysql(`update PCSEAT set in_use = '0' where seatnumber = ${userSeat}`);
+  await runMysql(`update PCROOM set endtime = '${getNowDate()}' where nickname = '${nickname}'`);
+}
+
+
 // insertNewUser('aaB');
 quitUser('new');
 
