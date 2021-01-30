@@ -1,3 +1,5 @@
+const db = require('./dbConnection.js');
+
 class PcRoom {
   runMysql(sql) {
     return new Promise((resolve, reject) => {
