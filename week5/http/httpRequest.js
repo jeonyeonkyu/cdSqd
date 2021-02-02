@@ -1,37 +1,57 @@
 const dns = require('dns');
 const net = require('net');
 const { log } = console;
-const socket = new net.Socket();
-
 
 class HttpRequest {
-  constructor(url) {
-    this.url = url;
+  constructor(method = 'GET') {
+    this.method = method;
+  }
+
+  getMessage(address) {
+    return `${this.method} / HTTP/1.1\r\nHost: ${address}\r\n\r\n`;
   }
 }
 
-class Header {
-  constructor() {
+class Socket {
+  constructor(address, port = 80, request) {
+    this.address = address;
+    this.port = port;
+    this.socket = new net.Socket();
+    this.request = request;
+  }
 
+  init() {
+    this.connect();
+    this.takeData();
+  }
+
+  connect() {
+    this.socket.connect({ port: this.port, host: this.address }, () => {
+      log('(DNS Lookup...)');
+      log(`TCP Connection: ${this.address} 80`);
+    })
+    this.write();
+  }
+
+  write() {
+    this.socket.write(`${this.request.getMessage(this.address)}`);
+  }
+
+  takeData() {
+    this.socket.on('data', (data) => {
+      console.log(data.toString());
+    })
   }
 }
 
-dns.lookup('www.disney.co.kr', (err, address) => {
-  if (err) {
-    log(err);
-    return;
-  }
-  log(address);
-  socket.connect({ port: 80, host: address }, () => {
-    log('(DNS Lookup...)');
-    log(`TCP Connection: ${address} 80`);
-    socket.write(`GET / HTTP/1.1\r\nHost: ${address}\r\n\r\n`);
-  })
-
-  socket.on('data', (data) => {//data 이벤트 발생시 callback
-    console.log(data.toString());
-    console.log(11)
-    process.exit();
+const run = (url) => {
+  dns.lookup(url, (err, address) => {
+    if (err) throw err;
+    const request = new HttpRequest();
+    const socket = new Socket(address, 80, request);
+    socket.init();
   });
+}
 
-});
+run('www.kyobobook.co.kr');
+
