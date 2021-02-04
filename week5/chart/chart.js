@@ -4,6 +4,7 @@ inputFile.addEventListener('change', async (event) => {
   const data = await loadFile(event.target);
   const peopleList = dataAdaptor(data).map(person => new People(person));
   const model = new Model(peopleList);
+  console.log(model.getDividedCategoryCount(model.people, 'game'))
 })
 
 function loadFile(sender) {
@@ -27,6 +28,24 @@ class Model {
     this.people = people;
   }
 
+  getDividedAgeCount(people) {
+    const peopleAge = people.map(item => item.age);
+    return peopleAge.reduce((acc, cur) => {
+      const key = Math.floor(cur / 10) * 10;
+      acc[key] = acc[key] || 0;
+      acc[key] += 1;
+      return acc;
+    }, {});
+  }
+
+  getDividedCategoryCount(people, category) {
+    const peopleItem = people.map(item => item[category]);
+    return peopleItem.reduce((acc, cur) => {
+      acc[cur] = acc[cur] || 0;
+      acc[cur] += 1;
+      return acc;
+    }, {});
+  }
 
 }
 
