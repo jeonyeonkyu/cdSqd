@@ -2,8 +2,8 @@ const inputFile = document.getElementById('csv_file');
 
 inputFile.addEventListener('change', async (event) => {
   const data = await loadFile(event.target);
-  const model = new Model(dataAdaptor(data));
-  console.log(model.getDataLength(model.people));
+  const peopleList = dataAdaptor(data).map(person => new People(person));
+  const model = new Model(peopleList);
 })
 
 function loadFile(sender) {
@@ -19,15 +19,7 @@ function loadFile(sender) {
 }
 
 function dataAdaptor(peopleData) {
-  const title = peopleData[0].replace(' ', '').split(',');
-  return peopleData.slice(2).map((item) => {
-    const personData = item.split(',');
-    const person = {};
-    for (let i = 0; i < title.length; i++) {
-      person[title[i]] = personData[i];
-    }
-    return person;
-  });
+  return peopleData.slice(2).map((item) => item.split(','));
 }
 
 class Model {
@@ -35,7 +27,14 @@ class Model {
     this.people = people;
   }
 
-  getDataLength(people) {
-    return Object.keys(people[0]).length;
+
+}
+
+class People {
+  constructor(person) {
+    this.name = person[0];
+    this.age = person[1];
+    this.fruit = person[2];
+    this.game = person[3];
   }
 }
