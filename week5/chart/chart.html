@@ -5,10 +5,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <link rel="stylesheet" href="./chart.css">
 </head>
 
 <body>
   <input type="file" id='csv_file'>
+  <input type="button" id='draw_chart' value='차트그리기' disabled>
+  <div id='container'>
+    <div id='chart_place'>
+      <canvas id='pi_chart_canvas' width='600' height="400"></canvas>
+    </div>
+    <div id='buttons_area'>
+      <input id='age' type="button" value='age'>
+      <input id='fruit' type="button" value='fruit'>
+      <input id='game' type="button" value='game'>
+    </div>
+  </div>
 
   <script src='./chart.js'></script>
 </body>
