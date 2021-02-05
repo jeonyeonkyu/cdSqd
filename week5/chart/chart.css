@@ -1,0 +1,9 @@
+#chart_place {
+  width: 600px;
+  height: 400px;
+  border: 1px solid gray;
+}
+
+#buttons_area {
+  display: none;
+}
