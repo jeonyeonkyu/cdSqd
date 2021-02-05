@@ -1,11 +1,18 @@
 const inputFile = document.getElementById('csv_file');
+const $canvas = document.querySelector('#pi_chart_canvas');
+const $drawChart = document.querySelector('#draw_chart');
+const $age = document.querySelector('#age');
+const $fruit = document.querySelector('#fruit');
+const $game = document.querySelector('#game');
+const $buttonsArea = document.querySelector('#buttons_area');
 
 inputFile.addEventListener('change', async (event) => {
   const data = await loadFile(event.target);
+  $drawChart.disabled = false;
   const peopleList = dataAdaptor(data).map(person => new People(person));
-  // console.log(peopleList)
   const model = new Model(peopleList);
-  console.log(model.etcFormatter(model.getDividedCategoryCount(model.people, 'game')))
+  const view = new View(model, $canvas, $drawChart, $age, $fruit, $game, $buttonsArea);
+  view.initEvent();
 })
 
 function loadFile(sender) {
@@ -45,7 +52,7 @@ class Model {
   getDividedAgeCount(people) {
     const peopleAge = people.map(item => item.age);
     return peopleAge.reduce((acc, cur) => {
-      const key = Math.floor(cur / 10) * 10;
+      const key = Math.floor(cur / 10) * 10 + '~' + Math.ceil(cur / 10) * 10;
       acc[key] = acc[key] || 0;
       acc[key] += 1;
       return acc;
@@ -71,7 +78,8 @@ class Model {
       }, {});
     const etcData = categoryEntries.filter((_, i) => i > 4)
       .reduce((acc, cur) => {
-        acc['etc'] = cur[1];
+        acc['etc'] = acc['etc'] || 0;
+        acc['etc'] += cur[1];
         return acc;
       }, {});
     return { ...toBeEnteredData, ...etcData };
@@ -80,8 +88,51 @@ class Model {
 
 class View {
   colors = ['#ff6b6b', '#cc5de8', '#845ef7', '#22b8cf', '#20c997', '#ff922b'];
-  constructor(model) {
+  constructor(model, $canvas, $drawChart, $age, $fruit, $game, $buttonsArea) {
     this.model = model;
+    this.ctx = $canvas.getContext('2d');
+    this.$drawChart = $drawChart;
+    this.$age = $age;
+    this.$fruit = $fruit;
+    this.$game = $game;
+    this.$buttonsArea = $buttonsArea;
   }
 
+  initEvent() {
+    this.$drawChart.addEventListener('click', this.showButtons.bind(this, this.$buttonsArea));
+    this.$age.addEventListener('click', this.render.bind(this, this.model.ageList));
+    this.$fruit.addEventListener('click', this.render.bind(this, this.model.fruitList));
+    this.$game.addEventListener('click', this.render.bind(this, this.model.gameList));
+  }
+
+  render(list) {
+    this.ctx.clearRect(0, 0, 600, 400);
+    let angle = 0;
+    let i = 0;
+    for (let category in list) {
+      const nextAngle = angle + Math.PI * 2 * (list[category] / 100);
+      this.ctx.fillStyle = this.colors[i];  //생성되는 부분의 채울 색 설정
+      this.ctx.beginPath();
+      this.ctx.moveTo(200, 200); //원의 중심으로 이동
+      this.ctx.arc(200, 200, 100, angle, nextAngle);
+      this.ctx.lineTo(200, 200);
+      this.ctx.fill();
+      const midAngle = (angle + nextAngle) / 2;
+      this.addText(this.ctx, category, `(${list[category]}%)`, this.colors[i++], midAngle);
+      angle = nextAngle;
+    }
+  }
+
+  addText(context, category, rateCount, colors, midAngle) {
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillStyle = colors;
+    context.font = "12pt Century Gothic";
+    context.fillText(category, 200 + Math.cos(midAngle) * 140, 200 + Math.sin(midAngle) * 140);
+    context.fillText(rateCount, 200 + Math.cos(midAngle) * 140, 200 + Math.sin(midAngle) * 140 + 20);
+  }
+
+  showButtons(buttonArea) {
+    buttonArea.setAttribute('style', 'display: inline;');
+  }
 }
